@@ -66,7 +66,7 @@ Two problems with equation 2:
 
 Compute:
 
-$$P(X) \approx \frac{1}{n} \sum_i P(X|Z_i)$$
+$$P(X) \approx \frac{1}{n} \sum_i P(X|Z_i) (3)$$
 - Lots of pixels are a problem
 - Euclidean distance on a 2d image means the log prob of P(X) is proportional to square of the distance between f(z) and X
 - Practical example: the exact same image as the image, shift down one pixel, may have a higher distance than one missing a key feature (a 2 without a loop)
@@ -85,4 +85,37 @@ Q(z) is not necessarily Gaussian.
 E[X|z] need to be related first P(X)
 
 Definition of Kullback-Leiber Divergence (The "distance" between two distributions)
-- 
+
+$$D[Q[z] || P(z|X)] = E_{z~Q}[\log Q(z) - \log P(z|X)] (4)$$
+
+After applying Bayes and rearranging and making Q(z) dependent on X:
+
+$$\log P(X) - D[Q(z|X)||P(z|X)] = E_{z~Q}[\log P(X|z)] - D[Q(z|X)||P(z)] (5)$$
+
+- We want to maximize $P(X)$, and minimize the DL term.. 
+- The right side can be optimized through SGD
+In the autoencoder framework: Q encodes X into z. P decodes to reconstruct X
+- A bit of math magic if happening here. With an arbitrarily high-capacity model (neural net), Q(z|X) approaches P(z|X)
+- We can calculate Q(z|X), not P(z|X)
+- {Try solving this by hand}
+
+### Optimizing the Objective
+
+Usual choice for Q(z|X) {You get to choose?}
+
+$$Q(z|X) = N(z|\mu(X;\Theta), \Sigma(X;\Theta))$$
+
+{That doesn't look like a theta!}
+- Where $\mu$ and $\Sigma$ and deterministic functions learned from the data
+- This is what the neural network approximates
+- $\Sigma$ must be diagonal {Probably cleans up the math}
+
+Recall that P(z) is N(0, I) (An assumption):
+
+The papers tells us the that the KL-divergence between the two multivariate Gaussians is:
+
+$$D[N(\mu(X), \Sigma(X))||N(0,I] = \frac{1}{2}(tr(\Sigma(X)) + (\mu(X))^T(\mu(X)) - k - \logdet(\Sigma(X)))$$
+
+Note: $\tr$ gives the sum of all diagonals in a matrix 
+
+
