@@ -103,7 +103,7 @@ In the autoencoder framework: Q encodes X into z. P decodes to reconstruct X
 
 Usual choice for Q(z|X) {You get to choose?}
 
-$$Q(z|X) = N(z|\mu(X;\Theta), \Sigma(X;\Theta))$$
+$$Q(z|X) = N(z|\mu(X;\Theta), \Sigma(X;\Theta)) (6)$$
 
 {That doesn't look like a theta!}
 - Where $\mu$ and $\Sigma$ and deterministic functions learned from the data
@@ -114,8 +114,33 @@ Recall that P(z) is N(0, I) (An assumption):
 
 The papers tells us the that the KL-divergence between the two multivariate Gaussians is:
 
-$$D[N(\mu(X), \Sigma(X))||N(0,I] = \frac{1}{2}(tr(\Sigma(X)) + (\mu(X))^T(\mu(X)) - k - \logdet(\Sigma(X)))$$
+$$D[N(\mu(X), \Sigma(X))||N(0,I] = \frac{1}{2}(tr(\Sigma(X)) + (\mu(X))^T(\mu(X)) - k - \logdet(\Sigma(X))) (7)$$
+
+Where is the number of dimensions
 
 Note: $\tr$ gives the sum of all diagonals in a matrix 
 
+Now for the right side.
+Using stochastic gradient descent on $E_{z~Q}[\log P(X|z)]$
 
+Sample X from the dataset D to get the equation we want to optimize:
+
+$$E_{X~D}[\log P(X) - D[Q(z|X)||P(z|X)]] = E_{X~D}[E_{z~Q}[\log P(X|z)] - D[Q(z|X)||P(z)]] (8)$$
+
+Take the gradient on the right {which slips through the expectation. Why?}:
+
+$$\log P(X|z) - D[Q(z|X)||P(z)]( (9)$$
+
+This gradient does not depend on the Q parameters. Without these Q parameters we can't back-propogate
+
+#### Reparameterization Trick
+
+- Currently the neurons in the network are stochastic, we need to the inputs to be stochastic instead {I don't understand this trick}
+- Sample $\epsilon ~ N(0,I))$
+- Then compute:
+$$z = \mu(X) + \Sigma^{frac{1}{2}}*\epsilon$$
+
+So:
+$$E_{X~D}[E_{\epsilon~N(0,1)}[\log P(X| \mu(X) + \Sigma^{frac{1}{2}}*\epsilon )] - D[Q(z|X)||P(z)]] (8)$$
+
+If X and \epsilon are fixed, the function is deterministic and continuous
